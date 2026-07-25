@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/kouji/vpm-tree.vim/pkg/tree"
+	"github.com/ue555/vpm-tree.vim/pkg/tree"
 )
 
 // Manager manages git operations

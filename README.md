@@ -49,7 +49,7 @@ A blazing-fast file tree explorer for Vim, powered by Golang.
 
 ### Method 1: Using vpm (Recommended)
 
-If you're using [vpm](https://github.com/kouji/vpm) (Vim Package Manager):
+If you're using [vpm](https://github.com/ue555/vpm) (Vim Package Manager):
 
 #### 1. Add to your plugins configuration
 
@@ -59,7 +59,7 @@ Add to `~/.config/vpm/plugins.json`:
 {
   "plugins": [
     {
-      "url": "kouji/vpm-tree.vim",
+      "url": "ue555/vpm-tree.vim",
       "build": "make build && sudo cp bin/vpm-tree /usr/local/bin/"
     }
   ]
@@ -83,7 +83,7 @@ This will:
 {
   "plugins": [
     {
-      "url": "kouji/vpm-tree.vim",
+      "url": "ue555/vpm-tree.vim",
       "build": "make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/"
     }
   ]
@@ -96,7 +96,7 @@ Make sure `~/.local/bin` is in your PATH.
 
 ```bash
 # Clone repository
-git clone https://github.com/kouji/vpm-tree.vim.git
+git clone https://github.com/ue555/vpm-tree.vim.git
 cd vpm-tree.vim
 
 # Build and install
@@ -132,7 +132,7 @@ cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree/
 ### Method 4: Using vim-plug
 
 ```vim
-Plug 'kouji/vpm-tree.vim', { 'do': 'make build' }
+Plug 'ue555/vpm-tree.vim', { 'do': 'make build' }
 ```
 
 **Note**: After installation with vim-plug, you still need to install the binary:

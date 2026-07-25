@@ -49,7 +49,7 @@ Golangで構築された、Vim用の超高速ファイルツリーエクスプ�
 
 ### 方法1: vpmを使用（推奨）
 
-[vpm](https://github.com/kouji/vpm)（Vim Package Manager）を使用している場合：
+[vpm](https://github.com/ue555/vpm)（Vim Package Manager）を使用している場合：
 
 #### 1. プラグイン設定に追加
 
@@ -59,7 +59,7 @@ Golangで構築された、Vim用の超高速ファイルツリーエクスプ�
 {
   "plugins": [
     {
-      "url": "kouji/vpm-tree.vim",
+      "url": "ue555/vpm-tree.vim",
       "build": "make build && sudo cp bin/vpm-tree /usr/local/bin/"
     }
   ]
@@ -83,7 +83,7 @@ vpm -config ~/.config/vpm/plugins.json -cmd install
 {
   "plugins": [
     {
-      "url": "kouji/vpm-tree.vim",
+      "url": "ue555/vpm-tree.vim",
       "build": "make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/"
     }
   ]
@@ -96,7 +96,7 @@ vpm -config ~/.config/vpm/plugins.json -cmd install
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/kouji/vpm-tree.vim.git
+git clone https://github.com/ue555/vpm-tree.vim.git
 cd vpm-tree.vim
 
 # ビルドとインストール
@@ -132,7 +132,7 @@ cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree/
 ### 方法4: vim-plugを使用
 
 ```vim
-Plug 'kouji/vpm-tree.vim', { 'do': 'make build' }
+Plug 'ue555/vpm-tree.vim', { 'do': 'make build' }
 ```
 
 **注意**: vim-plugでインストール後、バイナリのインストールが必要です：
