@@ -8,9 +8,13 @@ export def Setup(): void
   nnoremap <buffer> <silent> <CR> <ScriptCmd>core.OpenAtCursor()<CR>
   nnoremap <buffer> <silent> o <ScriptCmd>core.OpenAtCursor()<CR>
 
-  # Expand/collapse directory
-  nnoremap <buffer> <silent> <Space> <ScriptCmd>ToggleNode()<CR>
-  nnoremap <buffer> <silent> za <ScriptCmd>ToggleNode()<CR>
+  # Expand/collapse directory (fern.vim-style: l expands, h collapses)
+  nnoremap <buffer> <silent> l <ScriptCmd>core.ExpandAtCursor()<CR>
+  nnoremap <buffer> <silent> h <ScriptCmd>core.CollapseAtCursor()<CR>
+
+  # Toggle expand/collapse directory
+  nnoremap <buffer> <silent> <Space> <ScriptCmd>core.OpenAtCursor()<CR>
+  nnoremap <buffer> <silent> za <ScriptCmd>core.OpenAtCursor()<CR>
 
   # Refresh tree
   nnoremap <buffer> <silent> R <ScriptCmd>core.Refresh()<CR>
@@ -34,18 +38,6 @@ export def Setup(): void
 
   # Help
   nnoremap <buffer> <silent> ? <ScriptCmd>ShowHelp()<CR>
-enddef
-
-# Toggle expand/collapse for directory
-def ToggleNode(): void
-  var node = core.GetNodeAtLine(line('.'))
-
-  if empty(node) || node.type != 'directory'
-    return
-  endif
-
-  # TODO: Implement expand/collapse logic
-  echomsg 'Toggle: ' .. node.name
 enddef
 
 # Go to parent directory
@@ -75,7 +67,9 @@ def ShowHelp(): void
   var help_lines = [
     'VPM Tree Key Bindings:',
     '',
-    '<CR>, o    - Open file/directory',
+    '<CR>, o    - Open file/directory (toggle expand/collapse on dirs)',
+    'l         - Expand directory',
+    'h         - Collapse directory',
     '<Space>   - Toggle expand/collapse',
     'R, <F5>   - Refresh tree',
     'q         - Close tree',

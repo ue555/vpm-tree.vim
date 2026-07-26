@@ -4,10 +4,11 @@ vim9script
 export def CreateTree(): number
   # Create split
   if g:vpm_tree_position == 'left'
-    execute 'topleft vertical ' .. g:vpm_tree_width .. 'new'
+    execute 'topleft vertical new'
   else
-    execute 'botright vertical ' .. g:vpm_tree_width .. 'new'
+    execute 'botright vertical new'
   endif
+  execute 'vertical resize ' .. g:vpm_tree_width
 
   var bufnr = bufnr('%')
 
@@ -40,10 +41,11 @@ export def ShowTree(bufnr: number, winnr: number): void
 
   # Create split and show buffer
   if g:vpm_tree_position == 'left'
-    execute 'topleft vertical ' .. g:vpm_tree_width .. 'split'
+    execute 'topleft vertical split'
   else
-    execute 'botright vertical ' .. g:vpm_tree_width .. 'split'
+    execute 'botright vertical split'
   endif
+  execute 'vertical resize ' .. g:vpm_tree_width
 
   execute 'buffer ' .. bufnr
 enddef

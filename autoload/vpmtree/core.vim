@@ -166,15 +166,16 @@ enddef
 
 # Open file/directory at cursor
 export def OpenAtCursor(): void
-  var node = GetNodeAtLine(line('.'))
+  var node_index = line('.') - 3
 
-  if empty(node)
+  if node_index < 0 || node_index >= len(tree_data.nodes)
     return
   endif
 
+  var node = tree_data.nodes[node_index]
+
   if node.type == 'directory'
-    # TODO: Expand/collapse directory
-    echomsg 'Directory: ' .. node.name
+    ToggleDirectory(node_index)
   else
     # Open file in previous window
     var filepath = node.path
@@ -190,6 +191,99 @@ export def OpenAtCursor(): void
       Close()
     endif
   endif
+enddef
+
+# Expand the directory node at the cursor (no-op if already expanded or a file)
+export def ExpandAtCursor(): void
+  var node_index = line('.') - 3
+
+  if node_index < 0 || node_index >= len(tree_data.nodes)
+    return
+  endif
+
+  var node = tree_data.nodes[node_index]
+
+  if node.type == 'directory' && !node.expanded
+    ToggleDirectory(node_index)
+  endif
+enddef
+
+# Collapse the directory node at the cursor (no-op if already collapsed or a file)
+export def CollapseAtCursor(): void
+  var node_index = line('.') - 3
+
+  if node_index < 0 || node_index >= len(tree_data.nodes)
+    return
+  endif
+
+  var node = tree_data.nodes[node_index]
+
+  if node.type == 'directory' && node.expanded
+    ToggleDirectory(node_index)
+  endif
+enddef
+
+# Expand or collapse the directory node at the given index in tree_data.nodes
+def ToggleDirectory(node_index: number): void
+  var node = tree_data.nodes[node_index]
+
+  if node.expanded
+    # Collapse: drop the contiguous block of descendants that follows it
+    # (every node until we hit one back at this depth or shallower)
+    var remove_end = node_index + 1
+    while remove_end < len(tree_data.nodes) && tree_data.nodes[remove_end].depth > node.depth
+      remove_end += 1
+    endwhile
+
+    if remove_end > node_index + 1
+      remove(tree_data.nodes, node_index + 1, remove_end - 1)
+    endif
+
+    node.expanded = false
+  else
+    # Expand: fetch immediate children and splice them in right after this node
+    var children = LoadChildren(node)
+
+    if !empty(children)
+      tree_data.nodes = tree_data.nodes[0 : node_index]
+        + children
+        + tree_data.nodes[node_index + 1 :]
+    endif
+
+    node.expanded = true
+  endif
+
+  render.Draw(tree_bufnr, tree_data)
+enddef
+
+# Load the immediate children of a directory node via the vpm-tree CLI
+def LoadChildren(node: dict<any>): list<dict<any>>
+  var cmd = BuildCommand(node.path)
+  var output = system(cmd)
+
+  if v:shell_error != 0
+    echohl ErrorMsg
+    echomsg 'vpm-tree: Failed to load children: ' .. output
+    echohl None
+    return []
+  endif
+
+  try
+    var data = json_decode(output)
+    var children: list<dict<any>> = get(data, 'nodes', [])
+
+    for child in children
+      child.depth = node.depth + 1
+      child.parent_id = node.id
+    endfor
+
+    return children
+  catch
+    echohl ErrorMsg
+    echomsg 'vpm-tree: Failed to parse children: ' .. v:exception
+    echohl None
+    return []
+  endtry
 enddef
 
 # Auto command handler

@@ -19,7 +19,7 @@ endif
 g:vpm_tree_width = get(g:, 'vpm_tree_width', 35)
 g:vpm_tree_position = get(g:, 'vpm_tree_position', 'left')  # 'left' or 'right'
 g:vpm_tree_show_hidden = get(g:, 'vpm_tree_show_hidden', 0)
-g:vpm_tree_max_depth = get(g:, 'vpm_tree_max_depth', -1)
+g:vpm_tree_max_depth = get(g:, 'vpm_tree_max_depth', 0)
 g:vpm_tree_sort_by = get(g:, 'vpm_tree_sort_by', 'name')  # 'name', 'size', 'modified'
 g:vpm_tree_ignore_patterns = get(g:, 'vpm_tree_ignore_patterns', [])
 g:vpm_tree_include_git = get(g:, 'vpm_tree_include_git', 1)

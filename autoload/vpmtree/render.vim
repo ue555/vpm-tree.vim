@@ -9,8 +9,11 @@ export def Draw(bufnr: number, tree_data: dict<any>): void
   var lines: list<string> = []
 
   # Header
-  var root_name = fnamemodify(tree_data.root, ':~')
-  lines->add(' VPM Tree: ' .. root_name)
+  var root_name = fnamemodify(tree_data.root, ':t')
+  if empty(root_name)
+    root_name = tree_data.root
+  endif
+  lines->add(' ' .. root_name .. '/')
   lines->add(repeat('─', g:vpm_tree_width - 1))
 
   # Render nodes
@@ -26,6 +29,16 @@ export def Draw(bufnr: number, tree_data: dict<any>): void
     lines->add(RenderStats(tree_data.stats))
   endif
 
+  # Remember the cursor position so redrawing the whole buffer (which
+  # otherwise resets the cursor to line 1) doesn't yank focus around.
+  var winid = bufwinid(bufnr)
+  var saved_line = 1
+  var saved_col = 1
+  if winid > 0
+    saved_line = line('.', winid)
+    saved_col = col('.', winid)
+  endif
+
   # Write to buffer
   setbufvar(bufnr, '&modifiable', 1)
   deletebufline(bufnr, 1, '$')
@@ -34,6 +47,12 @@ export def Draw(bufnr: number, tree_data: dict<any>): void
 
   # Apply highlighting
   ApplyHighlights(bufnr)
+
+  # Restore the cursor (clamped in case lines were removed above it)
+  if winid > 0
+    var target_line = min([saved_line, len(lines)])
+    win_execute(winid, 'call cursor(' .. target_line .. ', ' .. saved_col .. ')')
+  endif
 enddef
 
 # Render a single node
@@ -139,7 +158,7 @@ def ApplyHighlights(bufnr: number): void
   win_execute(bufwinid(bufnr), 'syntax clear')
 
   # Header
-  win_execute(bufwinid(bufnr), 'syntax match VpmTreeHeader /^ VPM Tree:.*/')
+  win_execute(bufwinid(bufnr), 'syntax match VpmTreeHeader /\%1l.*/')
   win_execute(bufwinid(bufnr), 'syntax match VpmTreeSeparator /^─\+/')
 
   # Icons

@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
 // ScanOptions represents options for scanning the file tree
@@ -31,10 +30,6 @@ type Scanner struct {
 
 // NewScanner creates a new Scanner
 func NewScanner(opts *ScanOptions) *Scanner {
-	if opts.MaxDepth == 0 {
-		opts.MaxDepth = -1 // unlimited
-	}
-
 	return &Scanner{
 		options: opts,
 		nodes:   make([]*Node, 0),
