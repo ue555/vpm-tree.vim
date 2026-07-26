@@ -1,6 +1,5 @@
 # Binaries
 bin/
-vpm-tree
 *.exe
 *.exe~
 *.dll
