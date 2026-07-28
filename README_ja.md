@@ -102,9 +102,23 @@ vpm -config ~/.config/vpm/plugins.json -cmd install
 2. `vpm-tree` CLIバイナリがビルドされます
 3. バイナリとVimプラグインが自動的にインストールされます
 
-**注意**: オプション1または2を使用する場合、`~/.local/bin`がPATHに含まれていることを確認してください：
+**重要**: オプション1または2を使用する場合、`~/.local/bin`をPATHに追加してください：
+
+**Bash**を使用している場合、`~/.bashrc`に追加：
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**Zsh**を使用している場合、`~/.zshrc`に追加：
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+PATHが設定されているか確認：
+```bash
+which vpm-tree
 ```
 
 ### 方法2: ソースからビルド（推奨）

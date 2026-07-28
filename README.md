@@ -102,9 +102,23 @@ This will:
 2. Build the `vpm-tree` CLI binary
 3. Install binary and Vim plugin automatically
 
-**Note**: Make sure `~/.local/bin` is in your PATH if using Option 1 or 2:
+**Important**: Add `~/.local/bin` to your PATH if using Option 1 or 2:
+
+For **Bash** users, add to `~/.bashrc`:
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+For **Zsh** users, add to `~/.zshrc`:
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Verify the PATH is set:
+```bash
+which vpm-tree
 ```
 
 ### Method 2: Build from Source (Recommended)
