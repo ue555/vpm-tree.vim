@@ -55,12 +55,37 @@ If you're using [vpm](https://github.com/ue555/vpm) (Vim Package Manager):
 
 Add to `~/.config/vpm/plugins.json`:
 
+**Option 1: Using install script (easiest, no sudo required)**
 ```json
 {
   "plugins": [
     {
       "url": "ue555/vpm-tree.vim",
-      "build": "make build && sudo cp bin/vpm-tree /usr/local/bin/"
+      "build": "./install.sh"
+    }
+  ]
+}
+```
+
+**Option 2: Using make install-local (no sudo required)**
+```json
+{
+  "plugins": [
+    {
+      "url": "ue555/vpm-tree.vim",
+      "build": "make install-local"
+    }
+  ]
+}
+```
+
+**Option 3: Install to /usr/local/bin (requires sudo)**
+```json
+{
+  "plugins": [
+    {
+      "url": "ue555/vpm-tree.vim",
+      "build": "make install"
     }
   ]
 }
@@ -73,39 +98,36 @@ vpm -config ~/.config/vpm/plugins.json -cmd install
 ```
 
 This will:
-1. Clone the repository to `~/.vim/pack/vpm/start/vpm-tree`
+1. Clone the repository to `~/.vim/pack/vpm/start/vpm-tree.vim/`
 2. Build the `vpm-tree` CLI binary
-3. Install binary to `/usr/local/bin/`
+3. Install binary and Vim plugin automatically
 
-**Note**: The build command requires sudo for installing the binary. Alternatively, you can install to `~/.local/bin`:
-
-```json
-{
-  "plugins": [
-    {
-      "url": "ue555/vpm-tree.vim",
-      "build": "make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/"
-    }
-  ]
-}
+**Note**: Make sure `~/.local/bin` is in your PATH if using Option 1 or 2:
+```bash
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Make sure `~/.local/bin` is in your PATH.
-
-### Method 2: Build from Source
+### Method 2: Build from Source (Recommended)
 
 ```bash
 # Clone repository
 git clone https://github.com/ue555/vpm-tree.vim.git
 cd vpm-tree.vim
 
-# Build and install
+# Run installation script (easiest)
+./install.sh
+
+# Or use make (requires sudo for /usr/local/bin)
 make install
+
+# Or install to ~/.local/bin (no sudo required)
+make install-local
 ```
 
 This will:
-1. Build the `vpm-tree` CLI binary to `/usr/local/bin/`
-2. Install Vim plugin to `~/.vim/pack/vpm-tree/start/vpm-tree/`
+1. Build the `vpm-tree` CLI binary
+2. Install binary to `/usr/local/bin/` or `~/.local/bin/`
+3. Install Vim plugin to `~/.vim/pack/vpm-tree/start/vpm-tree.vim/`
 
 ### Method 3: Manual Installation
 
@@ -123,25 +145,31 @@ sudo cp bin/vpm-tree /usr/local/bin/
 
 ```bash
 # Create plugin directory
-mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree
+mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree.vim
 
 # Copy plugin files
-cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree/
+cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
 ```
 
 ### Method 4: Using vim-plug
 
 ```vim
-Plug 'ue555/vpm-tree.vim', { 'do': 'make build' }
+Plug 'ue555/vpm-tree.vim', { 'do': './install.sh' }
 ```
 
-**Note**: After installation with vim-plug, you still need to install the binary:
+**Note**: The installation script will automatically build and install the binary. If you prefer manual installation:
 
 ```bash
 cd ~/.vim/plugged/vpm-tree.vim
+
+# Option 1: Use install script
+./install.sh
+
+# Option 2: Use make with sudo
 sudo make install
-# or for ~/.local/bin
-make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/
+
+# Option 3: Install to ~/.local/bin (no sudo)
+make install-local
 ```
 
 ## Usage
@@ -185,7 +213,10 @@ Inside the tree window:
 Add to your `~/.vimrc` or `~/.vim/vimrc`:
 
 ```vim
-" Toggle tree with Ctrl-n
+" Toggle tree with ]e
+nnoremap ]e :VpmTreeToggle<CR>
+
+" Or use Ctrl-n
 nmap <C-n> <Plug>(vpm-tree-toggle)
 
 " Find current file with Leader-f

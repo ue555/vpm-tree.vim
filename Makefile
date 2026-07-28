@@ -17,14 +17,29 @@ build: ## Build the CLI binary
 	@go build -o $(BIN_DIR)/$(BINARY_NAME) ./cmd/vpm-tree
 	@echo "Binary built: $(BIN_DIR)/$(BINARY_NAME)"
 
-install: build ## Install binary to system PATH
+install: build ## Install binary and Vim plugin
 	@echo "Installing $(BINARY_NAME) to $(INSTALL_PATH)..."
 	@sudo cp $(BIN_DIR)/$(BINARY_NAME) $(INSTALL_PATH)/
-	@echo "Installed successfully!"
+	@echo "Binary installed successfully!"
 	@echo "Installing Vim plugin..."
-	@mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree
-	@cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree/
-	@echo "Vim plugin installed!"
+	@mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree.vim
+	@cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
+	@echo "Vim plugin installed to ~/.vim/pack/vpm-tree/start/vpm-tree.vim/"
+	@echo "Installation complete!"
+
+install-local: build ## Install binary to ~/.local/bin (no sudo required)
+	@echo "Installing $(BINARY_NAME) to ~/.local/bin..."
+	@mkdir -p ~/.local/bin
+	@cp $(BIN_DIR)/$(BINARY_NAME) ~/.local/bin/
+	@echo "Binary installed successfully!"
+	@echo "Installing Vim plugin..."
+	@mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree.vim
+	@cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
+	@echo "Vim plugin installed to ~/.vim/pack/vpm-tree/start/vpm-tree.vim/"
+	@echo "Installation complete!"
+	@echo ""
+	@echo "Make sure ~/.local/bin is in your PATH:"
+	@echo "  export PATH=\"\$$HOME/.local/bin:\$$PATH\""
 
 clean: ## Remove build artifacts
 	@echo "Cleaning build artifacts..."

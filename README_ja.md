@@ -55,12 +55,37 @@ Golangで構築された、Vim用の超高速ファイルツリーエクスプ�
 
 `~/.config/vpm/plugins.json` に追加：
 
+**オプション1: インストールスクリプトを使用（最も簡単、sudoなし）**
 ```json
 {
   "plugins": [
     {
       "url": "ue555/vpm-tree.vim",
-      "build": "make build && sudo cp bin/vpm-tree /usr/local/bin/"
+      "build": "./install.sh"
+    }
+  ]
+}
+```
+
+**オプション2: make install-localを使用（sudoなし）**
+```json
+{
+  "plugins": [
+    {
+      "url": "ue555/vpm-tree.vim",
+      "build": "make install-local"
+    }
+  ]
+}
+```
+
+**オプション3: /usr/local/binへインストール（sudoが必要）**
+```json
+{
+  "plugins": [
+    {
+      "url": "ue555/vpm-tree.vim",
+      "build": "make install"
     }
   ]
 }
@@ -73,39 +98,36 @@ vpm -config ~/.config/vpm/plugins.json -cmd install
 ```
 
 これにより：
-1. リポジトリが `~/.vim/pack/vpm/start/vpm-tree` にクローンされます
+1. リポジトリが `~/.vim/pack/vpm/start/vpm-tree.vim/` にクローンされます
 2. `vpm-tree` CLIバイナリがビルドされます
-3. バイナリが `/usr/local/bin/` にインストールされます
+3. バイナリとVimプラグインが自動的にインストールされます
 
-**注意**: ビルドコマンドはバイナリのインストールにsudoが必要です。代わりに `~/.local/bin` にインストールすることもできます：
-
-```json
-{
-  "plugins": [
-    {
-      "url": "ue555/vpm-tree.vim",
-      "build": "make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/"
-    }
-  ]
-}
+**注意**: オプション1または2を使用する場合、`~/.local/bin`がPATHに含まれていることを確認してください：
+```bash
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
-`~/.local/bin` がPATHに含まれていることを確認してください。
-
-### 方法2: ソースからビルド
+### 方法2: ソースからビルド（推奨）
 
 ```bash
 # リポジトリをクローン
 git clone https://github.com/ue555/vpm-tree.vim.git
 cd vpm-tree.vim
 
-# ビルドとインストール
+# インストールスクリプトを実行（最も簡単）
+./install.sh
+
+# または make を使用（/usr/local/bin へはsudoが必要）
 make install
+
+# または ~/.local/bin へインストール（sudoなし）
+make install-local
 ```
 
 これにより：
-1. `vpm-tree` CLIバイナリが `/usr/local/bin/` にビルドされます
-2. Vimプラグインが `~/.vim/pack/vpm-tree/start/vpm-tree/` にインストールされます
+1. `vpm-tree` CLIバイナリがビルドされます
+2. バイナリが `/usr/local/bin/` または `~/.local/bin/` にインストールされます
+3. Vimプラグインが `~/.vim/pack/vpm-tree/start/vpm-tree.vim/` にインストールされます
 
 ### 方法3: 手動インストール
 
@@ -123,25 +145,31 @@ sudo cp bin/vpm-tree /usr/local/bin/
 
 ```bash
 # プラグインディレクトリを作成
-mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree
+mkdir -p ~/.vim/pack/vpm-tree/start/vpm-tree.vim
 
 # プラグインファイルをコピー
-cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree/
+cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
 ```
 
 ### 方法4: vim-plugを使用
 
 ```vim
-Plug 'ue555/vpm-tree.vim', { 'do': 'make build' }
+Plug 'ue555/vpm-tree.vim', { 'do': './install.sh' }
 ```
 
-**注意**: vim-plugでインストール後、バイナリのインストールが必要です：
+**注意**: インストールスクリプトが自動的にバイナリをビルド・インストールします。手動でインストールする場合：
 
 ```bash
 cd ~/.vim/plugged/vpm-tree.vim
+
+# 方法1: インストールスクリプトを使用
+./install.sh
+
+# 方法2: makeを使用（sudoが必要）
 sudo make install
-# または ~/.local/bin へ
-make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/
+
+# 方法3: ~/.local/binへインストール（sudoなし）
+make install-local
 ```
 
 ## 使い方
@@ -185,7 +213,10 @@ make build && mkdir -p ~/.local/bin && cp bin/vpm-tree ~/.local/bin/
 `~/.vimrc` または `~/.vim/vimrc` に追加：
 
 ```vim
-" Ctrl-nでツリーをトグル
+" ]eでツリーをトグル
+nnoremap ]e :VpmTreeToggle<CR>
+
+" または、Ctrl-nでトグル
 nmap <C-n> <Plug>(vpm-tree-toggle)
 
 " Leader-fで現在のファイルを検索
