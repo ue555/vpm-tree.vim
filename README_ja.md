@@ -237,7 +237,7 @@ let g:vpm_tree_position = 'left'
 " 隠しファイルを表示
 let g:vpm_tree_show_hidden = 0
 
-" 最大深度 (-1で無制限)
+" 最大深度 (-1で無制限、0はルートのみ、1は1階層まで等)
 let g:vpm_tree_max_depth = -1
 
 " ソート方法: 'name', 'size', 'modified'

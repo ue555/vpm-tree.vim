@@ -237,7 +237,7 @@ let g:vpm_tree_position = 'left'
 " Show hidden files
 let g:vpm_tree_show_hidden = 0
 
-" Maximum depth (-1 for unlimited)
+" Maximum depth (-1 for unlimited, 0 for root only, 1 for one level, etc.)
 let g:vpm_tree_max_depth = -1
 
 " Sort by: 'name', 'size', or 'modified'
