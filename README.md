@@ -61,7 +61,7 @@ Add to `~/.config/vpm/plugins.json`:
   "plugins": [
     {
       "url": "ue555/vpm-tree.vim",
-      "build": "./install.sh"
+      "build": "bash install.sh"
     }
   ]
 }
@@ -154,7 +154,7 @@ cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
 ### Method 4: Using vim-plug
 
 ```vim
-Plug 'ue555/vpm-tree.vim', { 'do': './install.sh' }
+Plug 'ue555/vpm-tree.vim', { 'do': 'bash install.sh' }
 ```
 
 **Note**: The installation script will automatically build and install the binary. If you prefer manual installation:

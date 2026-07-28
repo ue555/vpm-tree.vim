@@ -29,23 +29,13 @@ echo ""
 
 # Install binary
 echo "[2/3] Installing binary..."
-if [ -w "/usr/local/bin" ]; then
-    # No sudo needed
-    cp "$BIN_DIR/$BINARY_NAME" /usr/local/bin/
-    echo "✓ Binary installed to /usr/local/bin/$BINARY_NAME"
-elif command -v sudo &> /dev/null; then
-    # Use sudo
-    sudo cp "$BIN_DIR/$BINARY_NAME" /usr/local/bin/
-    echo "✓ Binary installed to /usr/local/bin/$BINARY_NAME"
-else
-    # Install to ~/.local/bin
-    mkdir -p ~/.local/bin
-    cp "$BIN_DIR/$BINARY_NAME" ~/.local/bin/
-    echo "✓ Binary installed to ~/.local/bin/$BINARY_NAME"
-    echo ""
-    echo "  Note: Make sure ~/.local/bin is in your PATH:"
-    echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
-fi
+# Default to ~/.local/bin (no sudo required)
+mkdir -p ~/.local/bin
+cp "$BIN_DIR/$BINARY_NAME" ~/.local/bin/
+echo "✓ Binary installed to ~/.local/bin/$BINARY_NAME"
+echo ""
+echo "  Note: Make sure ~/.local/bin is in your PATH:"
+echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
 echo ""
 
 # Install Vim plugin

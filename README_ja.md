@@ -61,7 +61,7 @@ Golangで構築された、Vim用の超高速ファイルツリーエクスプ�
   "plugins": [
     {
       "url": "ue555/vpm-tree.vim",
-      "build": "./install.sh"
+      "build": "bash install.sh"
     }
   ]
 }
@@ -154,7 +154,7 @@ cp -r plugin autoload ~/.vim/pack/vpm-tree/start/vpm-tree.vim/
 ### 方法4: vim-plugを使用
 
 ```vim
-Plug 'ue555/vpm-tree.vim', { 'do': './install.sh' }
+Plug 'ue555/vpm-tree.vim', { 'do': 'bash install.sh' }
 ```
 
 **注意**: インストールスクリプトが自動的にバイナリをビルド・インストールします。手動でインストールする場合：
