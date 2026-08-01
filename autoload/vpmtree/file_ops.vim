@@ -41,6 +41,21 @@ def Prompt(message: string, default_value: string = ''): string
   return result
 enddef
 
+def ResolvePath(target_path: string, input_path: string): string
+  var relative_path = input_path
+  var target_name = fnamemodify(target_path, ':t')
+
+  if relative_path =~# '^\.\/'
+    relative_path = relative_path[2 :]
+  endif
+
+  if !empty(target_name) && relative_path =~# '^' .. escape(target_name, '\.^$~[]') .. '/'
+    relative_path = relative_path[len(target_name) + 1 :]
+  endif
+
+  return simplify(target_path .. '/' .. relative_path)
+enddef
+
 # Create a new file
 export def CreateFile(parent_path: string = ''): void
   var target_path = parent_path
@@ -62,7 +77,7 @@ export def CreateFile(parent_path: string = ''): void
     return
   endif
 
-  var filepath = target_path .. '/' .. filename
+  var filepath = ResolvePath(target_path, filename)
 
   # Check if file already exists
   if filereadable(filepath) || isdirectory(filepath)
@@ -75,6 +90,7 @@ export def CreateFile(parent_path: string = ''): void
 
   # Create the file
   try
+    mkdir(fnamemodify(filepath, ':h'), 'p')
     writefile([], filepath)
     redraw
     echomsg 'Created file: ' .. filepath
@@ -108,7 +124,7 @@ export def CreateDirectory(parent_path: string = ''): void
     return
   endif
 
-  var dirpath = target_path .. '/' .. dirname
+  var dirpath = ResolvePath(target_path, dirname)
 
   # Check if directory already exists
   if isdirectory(dirpath) || filereadable(dirpath)

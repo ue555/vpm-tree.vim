@@ -92,6 +92,7 @@ enddef
 # Load tree data from vpm-tree CLI
 def LoadTree(root: string): void
   current_root = root
+  var expanded_paths = GetExpandedPaths()
 
   # Build command
   var cmd = BuildCommand(root)
@@ -109,6 +110,9 @@ def LoadTree(root: string): void
   # Parse JSON
   try
     tree_data = json_decode(output)
+    if has_key(tree_data, 'nodes')
+      tree_data.nodes = NormalizeVisibleNodes(tree_data.nodes, expanded_paths)
+    endif
 
     # Render the tree
     render.Draw(tree_bufnr, tree_data)
@@ -118,6 +122,64 @@ def LoadTree(root: string): void
     echomsg 'vpm-tree: Failed to parse tree data: ' .. v:exception
     echohl None
   endtry
+enddef
+
+def GetExpandedPaths(): list<string>
+  var expanded_paths: list<string> = []
+  if !has_key(tree_data, 'nodes')
+    return expanded_paths
+  endif
+
+  for node in tree_data.nodes
+    if node.type == 'directory' && get(node, 'expanded', false)
+      expanded_paths->add(node.path)
+    endif
+  endfor
+
+  return expanded_paths
+enddef
+
+def AddVisibleNode(node: dict<any>, children_by_parent: dict<any>, visible_nodes: list<dict<any>>): void
+  visible_nodes->add(node)
+
+  if node.type != 'directory' || !get(node, 'expanded', false)
+    return
+  endif
+
+  for child in get(children_by_parent, node.id, [])
+    AddVisibleNode(child, children_by_parent, visible_nodes)
+  endfor
+enddef
+
+def NormalizeVisibleNodes(nodes: list<dict<any>>, expanded_paths: list<string>): list<dict<any>>
+  var visible_nodes: list<dict<any>> = []
+  var expanded_lookup: dict<bool> = {}
+  var root_nodes: list<dict<any>> = []
+  var children_by_parent: dict<any> = {}
+
+  for path in expanded_paths
+    expanded_lookup[path] = true
+  endfor
+
+  for node in nodes
+    node.expanded = node.type == 'directory' && has_key(expanded_lookup, node.path)
+
+    var parent_id = get(node, 'parent_id', '')
+    if empty(parent_id)
+      root_nodes->add(node)
+    else
+      if !has_key(children_by_parent, parent_id)
+        children_by_parent[parent_id] = []
+      endif
+      add(children_by_parent[parent_id], node)
+    endif
+  endfor
+
+  for node in root_nodes
+    AddVisibleNode(node, children_by_parent, visible_nodes)
+  endfor
+
+  return visible_nodes
 enddef
 
 # Build command to execute vpm-tree CLI
