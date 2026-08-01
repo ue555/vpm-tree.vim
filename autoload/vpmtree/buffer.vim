@@ -27,7 +27,7 @@ export def CreateTree(): number
   setlocal nomodifiable
 
   # Set buffer name
-  execute 'file VpmTree'
+  silent execute 'file VpmTree'
 
   return bufnr
 enddef

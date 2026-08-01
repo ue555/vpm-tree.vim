@@ -30,6 +30,8 @@ export def Open(): void
 
   # Load and render tree
   LoadTree(root)
+  redraw
+  echo ''
 enddef
 
 # Close the tree
