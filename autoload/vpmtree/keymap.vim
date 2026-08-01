@@ -1,6 +1,7 @@
 vim9script
 
 import './core.vim'
+import './file_ops.vim' as ops
 
 # Setup key mappings for tree buffer
 export def Setup(): void
@@ -15,6 +16,12 @@ export def Setup(): void
   # Toggle expand/collapse directory
   nnoremap <buffer> <silent> <Space> <ScriptCmd>core.OpenAtCursor()<CR>
   nnoremap <buffer> <silent> za <ScriptCmd>core.OpenAtCursor()<CR>
+
+  # File operations
+  nnoremap <buffer> <silent> a <ScriptCmd>CreateFile()<CR>
+  nnoremap <buffer> <silent> A <ScriptCmd>CreateDirectory()<CR>
+  nnoremap <buffer> <silent> d <ScriptCmd>Delete()<CR>
+  nnoremap <buffer> <silent> r <ScriptCmd>Rename()<CR>
 
   # Refresh tree
   nnoremap <buffer> <silent> R <ScriptCmd>core.Refresh()<CR>
@@ -38,6 +45,23 @@ export def Setup(): void
 
   # Help
   nnoremap <buffer> <silent> ? <ScriptCmd>ShowHelp()<CR>
+enddef
+
+# Wrapper functions for file operations
+def CreateFile(): void
+  ops.CreateFile()
+enddef
+
+def CreateDirectory(): void
+  ops.CreateDirectory()
+enddef
+
+def Delete(): void
+  ops.Delete()
+enddef
+
+def Rename(): void
+  ops.Rename()
 enddef
 
 # Go to parent directory
@@ -71,6 +95,12 @@ def ShowHelp(): void
     'l         - Expand directory',
     'h         - Collapse directory',
     '<Space>   - Toggle expand/collapse',
+    '',
+    'a         - Create new file',
+    'A         - Create new directory',
+    'd         - Delete file/directory',
+    'r         - Rename file/directory',
+    '',
     'R, <F5>   - Refresh tree',
     'q         - Close tree',
     'j/k       - Navigate up/down',

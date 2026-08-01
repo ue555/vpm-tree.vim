@@ -18,6 +18,7 @@ A blazing-fast file tree explorer for Vim, powered by Golang.
 - ⌨️ **Vim9script** - Modern Vim9script plugin
 - 🔧 **Configurable** - Extensive customization options
 - 💪 **Lightweight** - Minimal memory footprint
+- 📝 **File Operations** - Create, delete, and rename files/directories directly from the tree
 
 ## Architecture
 
@@ -214,13 +215,38 @@ Inside the tree window:
 | Key | Action |
 |-----|--------|
 | `<CR>`, `o` | Open file/directory |
+| `l` | Expand directory |
+| `h` | Collapse directory |
 | `<Space>`, `za` | Toggle expand/collapse |
+| `a` | Create new file |
+| `A` | Create new directory |
+| `d` | Delete file/directory |
+| `r` | Rename file/directory |
 | `R`, `<F5>` | Refresh tree |
 | `q` | Close tree |
 | `j/k` | Navigate up/down |
 | `-`, `u` | Go to parent directory |
 | `C` | Change root to current directory |
 | `?` | Show help |
+
+### File Operations
+
+vpm-tree.vim supports common file operations directly from the tree:
+
+#### Create File (`a`)
+Press `a` to create a new file in the current directory (or parent directory if cursor is on a file).
+You will be prompted to enter the filename.
+
+#### Create Directory (`A`)
+Press `A` to create a new directory in the current directory (or parent directory if cursor is on a file).
+You will be prompted to enter the directory name.
+
+#### Delete (`d`)
+Press `d` to delete the file or directory at cursor. You will be asked to confirm the deletion.
+For directories, all contents will be deleted recursively.
+
+#### Rename (`r`)
+Press `r` to rename the file or directory at cursor. You will be prompted to enter the new name.
 
 ### Recommended Key Mappings
 
