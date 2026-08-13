@@ -98,6 +98,11 @@ def LoadTree(root: string): void
 
   # Build command
   var cmd = BuildCommand(root)
+  # On initial load, get only immediate children (depth 0)
+  # This prevents loading the entire tree at once
+  if empty(expanded_paths)
+    cmd ..= ' -depth 0'
+  endif
 
   # Execute command and get JSON output
   var output = system(cmd)
@@ -323,6 +328,8 @@ enddef
 # Load the immediate children of a directory node via the vpm-tree CLI
 def LoadChildren(node: dict<any>): list<dict<any>>
   var cmd = BuildCommand(node.path)
+  # Force depth 1 to get only immediate children
+  cmd ..= ' -depth 0'
   var output = system(cmd)
 
   if v:shell_error != 0
