@@ -56,6 +56,145 @@ def ResolvePath(target_path: string, input_path: string): string
   return simplify(target_path .. '/' .. relative_path)
 enddef
 
+def NormalizePath(path: string): string
+  return substitute(simplify(fnamemodify(path, ':p')), '/\+$', '', '')
+enddef
+
+def BufferRenames(old_path: string, new_path: string): list<dict<any>>
+  var old_normalized = NormalizePath(old_path)
+  var new_normalized = NormalizePath(new_path)
+  var old_prefix = old_normalized .. '/'
+  var source_is_directory = isdirectory(old_path)
+  var renames: list<dict<any>> = []
+
+  for info in getbufinfo()
+    if empty(info.name)
+      continue
+    endif
+    var buffer_path = NormalizePath(info.name)
+    var mode = !info.loaded ? 'unloaded'
+      : isdirectory(buffer_path) ? 'rename'
+      : info.changed ? 'save'
+      : 'reload'
+    if buffer_path == old_normalized
+      renames->add({
+        bufnr: info.bufnr,
+        path: new_normalized,
+        mode: mode,
+      })
+    elseif source_is_directory && stridx(buffer_path, old_prefix) == 0
+      renames->add({
+        bufnr: info.bufnr,
+        path: new_normalized .. strpart(buffer_path, strlen(old_normalized)),
+        mode: mode,
+      })
+    endif
+  endfor
+
+  return renames
+enddef
+
+def HasBufferConflict(renames: list<dict<any>>): bool
+  var renamed_buffers: dict<bool> = {}
+  var target_paths: dict<bool> = {}
+  for item in renames
+    renamed_buffers[string(item.bufnr)] = true
+    target_paths[item.path] = true
+  endfor
+
+  for info in getbufinfo()
+    if empty(info.name) || has_key(renamed_buffers, string(info.bufnr))
+      continue
+    endif
+    if has_key(target_paths, NormalizePath(info.name))
+      return true
+    endif
+  endfor
+  return false
+enddef
+
+def BufferChangedExternally(bufnr: number): bool
+  v:warningmsg = ''
+  execute 'silent checktime ' .. bufnr
+  return !empty(v:warningmsg)
+enddef
+
+def RenameBuffer(bufnr: number, new_path: string, mode: string): void
+  if !bufloaded(bufnr)
+    execute 'silent! bwipeout! ' .. bufnr
+    return
+  endif
+
+  var old_buffer_path = NormalizePath(bufname(bufnr))
+  var rename_command = mode == 'save' ? 'silent keepalt saveas! ' : 'silent keepalt file '
+  var windows = win_findbuf(bufnr)
+  if !empty(windows)
+    win_execute(windows[0], rename_command .. fnameescape(new_path))
+    if mode == 'reload'
+      win_execute(windows[0], 'silent keepalt edit!')
+    endif
+  else
+    var host_winid = FindPromptWinId()
+    var original_bufnr = winbufnr(host_winid)
+    try
+      win_execute(host_winid, printf('silent keepalt noautocmd hide buffer %d', bufnr))
+      win_execute(host_winid, rename_command .. fnameescape(new_path))
+      if mode == 'reload'
+        win_execute(host_winid, 'silent keepalt edit!')
+      endif
+    finally
+      if winbufnr(host_winid) != original_bufnr
+        win_execute(host_winid, printf('silent keepalt noautocmd hide buffer %d', original_bufnr))
+      endif
+    endtry
+  endif
+
+  if mode == 'save'
+    # :saveas keeps an unloaded alternate buffer for the old path.
+    for info in getbufinfo()
+      if !empty(info.name) && NormalizePath(info.name) == old_buffer_path
+        execute 'silent! bwipeout! ' .. info.bufnr
+      endif
+    endfor
+  endif
+enddef
+
+export def RenamePath(old_path: string, new_path: string): bool
+  if filereadable(new_path) || isdirectory(new_path)
+    echohl ErrorMsg
+    echomsg 'File or directory already exists: ' .. fnamemodify(new_path, ':t')
+    echohl None
+    return false
+  endif
+
+  var buffer_renames = BufferRenames(old_path, new_path)
+  if HasBufferConflict(buffer_renames)
+    echohl ErrorMsg
+    echomsg 'A Vim buffer already uses the rename destination'
+    echohl None
+    return false
+  endif
+
+  for item in buffer_renames
+    if item.mode == 'save' && BufferChangedExternally(item.bufnr)
+      echohl ErrorMsg
+      echomsg 'File changed outside Vim; reload or save it before renaming'
+      echohl None
+      return false
+    endif
+  endfor
+
+  if rename(old_path, new_path) != 0
+    return false
+  endif
+
+  for item in buffer_renames
+    RenameBuffer(item.bufnr, item.path, item.mode)
+  endfor
+
+  return true
+enddef
+
 # Create a new file
 export def CreateFile(parent_path: string = ''): void
   var target_path = parent_path
@@ -244,19 +383,9 @@ export def Rename(): void
 
   var new_path = parent_dir .. '/' .. new_name
 
-  # Check if target already exists
-  if filereadable(new_path) || isdirectory(new_path)
-    redraw
-    echohl ErrorMsg
-    echomsg 'File or directory already exists: ' .. new_name
-    echohl None
-    return
-  endif
-
   # Perform rename
   try
-    var result = rename(old_path, new_path)
-    if result == 0
+    if RenamePath(old_path, new_path)
       redraw
       echomsg 'Renamed "' .. old_name .. '" to "' .. new_name .. '"'
       core.Refresh()

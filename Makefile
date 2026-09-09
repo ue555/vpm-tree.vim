@@ -54,6 +54,7 @@ fmt: ## Format Go code
 test: ## Run tests
 	@echo "Running tests..."
 	@go test -v ./...
+	@vim -Nu NONE -n -es -S tests/test_file_ops.vim
 
 run: build ## Run the CLI with current directory
 	@./$(BIN_DIR)/$(BINARY_NAME) -pretty

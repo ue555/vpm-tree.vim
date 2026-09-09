@@ -43,7 +43,7 @@ A blazing-fast file tree explorer for Vim, powered by Golang.
 ## Requirements
 
 - **Vim** >= 9.0 (with vim9script support)
-- **Go** >= 1.21 (for building)
+- **Go** >= 1.25 (for building; compatible through Go 1.27)
 - **Git** >= 2.19.0 (optional, for git features)
 
 ## Installation

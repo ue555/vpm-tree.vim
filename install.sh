@@ -16,7 +16,15 @@ echo ""
 # Check if Go is installed
 if ! command -v go &> /dev/null; then
     echo "Error: Go is not installed"
-    echo "Please install Go >= 1.21 from https://go.dev/dl/"
+    echo "Please install Go >= 1.25 from https://go.dev/dl/"
+    exit 1
+fi
+
+# Require the minimum version declared in go.mod.
+GO_VERSION="$(go env GOVERSION)"
+if [[ ! "$GO_VERSION" =~ ^go([0-9]+)\.([0-9]+) ]] ||
+   (( BASH_REMATCH[1] < 1 || (BASH_REMATCH[1] == 1 && BASH_REMATCH[2] < 25) )); then
+    echo "Error: Go >= 1.25 is required (found $GO_VERSION)"
     exit 1
 fi
 
