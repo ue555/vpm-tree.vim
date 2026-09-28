@@ -1,7 +1,7 @@
 .PHONY: build install clean test fmt help
 .DEFAULT_GOAL := help
 
-BINARY_NAME=vpm-tree
+BINARY_NAME=vpm-tree$(shell go env GOEXE)
 BIN_DIR=bin
 INSTALL_PATH=/usr/local/bin
 

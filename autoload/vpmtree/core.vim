@@ -30,8 +30,6 @@ export def Open(): void
 
   # Load and render tree
   LoadTree(root)
-  redraw
-  echo ''
 enddef
 
 # Close the tree
@@ -189,11 +187,30 @@ def NormalizeVisibleNodes(nodes: list<dict<any>>, expanded_paths: list<string>):
   return visible_nodes
 enddef
 
+# Resolve the vpm-tree executable path.
+# On Windows, cmd.exe cannot run a file without an extension, so prefer
+# the '.exe' variant when g:vpm_tree_bin points to an extension-less file.
+def ResolveBin(): string
+  var bin: string = g:vpm_tree_bin
+  if has('win32') && fnamemodify(bin, ':e') !=? 'exe' && executable(bin .. '.exe')
+    bin ..= '.exe'
+  endif
+  var path = exepath(bin)
+  return empty(path) ? bin : path
+enddef
+
+# Quote a path for the shell. On Windows, use forward slashes so the path
+# survives both cmd.exe and a POSIX shell (e.g. Git Bash sets shell=bash,
+# which treats backslashes as escape characters).
+def ShellPath(path: string): string
+  return shellescape(has('win32') ? tr(path, '\', '/') : path)
+enddef
+
 # Build command to execute vpm-tree CLI
 def BuildCommand(root: string): string
-  var cmd = g:vpm_tree_bin
+  var cmd = ShellPath(ResolveBin())
 
-  cmd ..= ' -root ' .. shellescape(root)
+  cmd ..= ' -root ' .. ShellPath(root)
 
   if g:vpm_tree_max_depth >= 0
     cmd ..= ' -depth ' .. g:vpm_tree_max_depth

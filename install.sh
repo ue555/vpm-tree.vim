@@ -5,7 +5,6 @@
 
 set -e
 
-BINARY_NAME="vpm-tree"
 BIN_DIR="bin"
 
 echo "========================================="
@@ -27,6 +26,9 @@ if [[ ! "$GO_VERSION" =~ ^go([0-9]+)\.([0-9]+) ]] ||
     echo "Error: Go >= 1.25 is required (found $GO_VERSION)"
     exit 1
 fi
+
+# go env GOEXE is ".exe" on Windows (cmd.exe cannot run extension-less files)
+BINARY_NAME="vpm-tree$(go env GOEXE)"
 
 # Build binary
 echo "[1/3] Building CLI binary..."
